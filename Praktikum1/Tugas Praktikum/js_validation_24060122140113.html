@@ -1,0 +1,184 @@
+// nama 
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Form Tambah Produk</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        form {
+            border: 1px solid #000;
+            padding: 20px;
+            width: 300px;
+            margin: 20px auto;
+            box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        input[type="text"], input[type="number"], select, textarea {
+            border: 1px solid #000;
+            padding: 5px;
+            margin: 5px 0;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        textarea {
+            resize: none;
+        }
+
+        input[type="submit"], input[type="reset"] {
+            border: 1px solid #000;
+            background-color: #f2f2f2;
+            padding: 5px 10px;
+            cursor: pointer;
+            margin-top: 10px;
+            margin-right: 5px;
+        }
+
+        input[type="submit"]:hover, input[type="reset"]:hover {
+            background-color: #e0e0e0;
+        }
+
+        #captchaText {
+            font-weight: bold;
+        }
+
+        label {
+            display: block;
+            margin-top: 10px;
+        }
+
+        input[type="checkbox"] {
+            margin-right: 5px;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Form Tambah Data Produk</h2>
+
+<form id="productForm" onsubmit="return validateForm()">
+    Nama Produk: 
+    <input type="text" id="productName" name="productName" minlength="5" maxlength="30" required>
+
+    Deskripsi Produk: 
+    <textarea id="productDescription" name="productDescription" minlength="5" maxlength="100" required></textarea>
+
+    Kategori: 
+    <select id="category" name="category" required onchange="updateSubCategory()">
+        <option value="">Pilih Kategori</option>
+        <option value="Baju">Baju</option>
+        <option value="Elektronik">Elektronik</option>
+        <option value="Alat Tulis">Alat Tulis</option>
+    </select>
+
+    Sub Kategori: 
+    <select id="subCategory" name="subCategory" required>
+        <option value="">Pilih Sub Kategori</option>
+    </select>
+
+    Harga Satuan: 
+    <input type="number" id="price" name="price" required>
+
+    Grosir:<br> 
+    <input type="checkbox" id="grosirYes" name="grosirOption" value="yes" onchange="togglegrosirPrice()"> Ya
+    <input type="checkbox" id="grosirNo" name="grosirOption" value="no" onchange="togglegrosirPrice()"> Tidak
+
+    Harga Grosir: 
+    <input type="number" id="grosirPrice" name="grosirPrice" disabled>
+
+    Jasa Kirim:<br> 
+    <input type="checkbox" name="shippingService" value="JNE"> JNE
+    <input type="checkbox" name="shippingService" value="TIKI"> TIKI
+    <input type="checkbox" name="shippingService" value="SICEPAT"> SICEPAT
+    <input type="checkbox" name="shippingService" value="Ninja Express"> Ninja Express
+    <input type="checkbox" name="shippingService" value="Wahana"> Wahana
+
+    <br><br>
+    Captcha: 
+    <input type="text" id="captcha" name="captcha" required>
+    <span id="captchaText"></span>
+
+    <input type="submit" value="Submit">
+    <input type="reset" value="Reset" onclick="resetForm()">
+</form>
+
+<script>
+    function updateSubCategory() {
+        const subCategory = document.getElementById('subCategory');
+        const category = document.getElementById('category').value;
+
+        subCategory.innerHTML = ''; 
+
+        if (category === 'Baju') {
+            subCategory.innerHTML += '<option value="Baju Pria">Baju Pria</option>';
+            subCategory.innerHTML += '<option value="Baju Wanita">Baju Wanita</option>';
+            subCategory.innerHTML += '<option value="Baju Anak">Baju Anak</option>';
+        } else if (category === 'Elektronik') {
+            subCategory.innerHTML += '<option value="Mesin Cuci">Mesin Cuci</option>';
+            subCategory.innerHTML += '<option value="Kulkas">Kulkas</option>';
+            subCategory.innerHTML += '<option value="AC">AC</option>';
+        } else if (category === 'Alat Tulis') {
+            subCategory.innerHTML += '<option value="Kertas">Kertas</option>';
+            subCategory.innerHTML += '<option value="Map">Map</option>';
+            subCategory.innerHTML += '<option value="Pulpen">Pulpen</option>';
+        }
+    }
+
+    function togglegrosirPrice() {
+        const grosirYes = document.getElementById('grosirYes').checked;
+        const grosirNo = document.getElementById('grosirNo').checked;
+        const grosirPrice = document.getElementById('grosirPrice');
+
+        if (grosirYes) {
+            grosirPrice.disabled = false;
+            grosirPrice.required = true;
+            document.getElementById('grosirNo').checked = false; // Uncheck "Tidak"
+        } else if (grosirNo) {
+            grosirPrice.disabled = true;
+            grosirPrice.required = false;
+            document.getElementById('grosirYes').checked = false; // Uncheck "Ya"
+        }
+    }
+
+    function validateForm() {
+        const shippingServices = document.querySelectorAll('input[name="shippingService"]:checked');
+        if (shippingServices.length < 3) {
+            alert("Minimal tiga jasa kirim harus dipilih.");
+            return false;
+        }
+
+        const enteredCaptcha = document.getElementById('captcha').value;
+        const actualCaptcha = document.getElementById('captchaText').textContent;
+
+        if (enteredCaptcha !== actualCaptcha) {
+            alert("Captcha salah.");
+            return false;
+        }
+
+        return true;
+    }
+
+    function generateCaptcha() {
+        const captchaText = document.getElementById('captchaText');
+        const randomCaptcha = String.fromCharCode(...Array(5).fill().map(() => Math.floor(Math.random() * 26) + 65));
+        captchaText.textContent = randomCaptcha;
+    }
+
+    function resetForm() {
+        generateCaptcha();
+    }
+
+    window.onload = generateCaptcha;
+</script>
+
+</body>
+</html>
